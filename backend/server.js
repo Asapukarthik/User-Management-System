@@ -17,7 +17,7 @@ app.use(helmet());
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://user-management-system-eight-ivory.vercel.app/"
+    "https://user-management-system-eight-ivory.vercel.app"
   ],
   credentials: true
 }));
