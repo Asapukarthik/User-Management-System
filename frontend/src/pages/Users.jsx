@@ -1,5 +1,5 @@
-import { Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { Plus, Search, Filter, Download, UserPlus } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import axiosInstance from '../api/axios'
 import ConfirmDeleteModal from '../components/ConfirmDeleteModal'
@@ -34,7 +34,7 @@ const Users = () => {
         isDeleted: showDeleted ? 'true' : 'false',
         needsApproval: showPending ? 'true' : undefined,
       }
-      
+
       const response = await axiosInstance.get('/api/users', { params })
       const data = response?.data
       setUsers(data?.data || [])
@@ -58,9 +58,7 @@ const Users = () => {
   }, [search])
 
   const onConfirmDelete = async () => {
-    if (!deleteUser) {
-      return
-    }
+    if (!deleteUser) return
     setDeleteLoading(true)
     try {
       await axiosInstance.delete(`/api/users/${deleteUser._id}`)
@@ -90,111 +88,99 @@ const Users = () => {
   }
 
   return (
-    <section className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Users</h2>
-          <p className="text-sm text-slate-500">Manage users, roles, and account status.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">User Directory</h1>
+          <p className="text-sm font-medium text-slate-500">Manage digital identities and security credentials.</p>
         </div>
-        <Link
-          to="/users/create"
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-        >
-          <Plus className="h-4 w-4" />
-          Create User
-        </Link>
-      </div>
+        <div className="flex items-center gap-3">
 
-      <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-4 lg:grid-cols-5">
-        <div className="md:col-span-2">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search by name or email..." />
+          <Link to="/users/create" className="btn-primary h-11 px-6">
+            <UserPlus size={18} />
+            Create Instance
+          </Link>
         </div>
-        <select
-          value={roleFilter}
-          onChange={(event) => {
-            setRoleFilter(event.target.value)
-            setPage(1)
-          }}
-          className="rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-blue-500"
-        >
-          <option value="all">All Roles</option>
-          <option value="admin">Admin</option>
-          <option value="manager">Manager</option>
-          <option value="user">User</option>
-        </select>
-        <div className="flex items-center gap-4 px-2 md:col-span-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="showDeleted"
-              checked={showDeleted}
-              onChange={(e) => {
-                setShowDeleted(e.target.checked)
-                if (e.target.checked) setShowPending(false)
-                setPage(1)
-              }}
-              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="showDeleted" className="text-sm font-medium text-slate-700">
-              Deleted
-            </label>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="showPending"
-              checked={showPending}
-              onChange={(e) => {
-                setShowPending(e.target.checked)
-                if (e.target.checked) setShowDeleted(false)
-                setPage(1)
-              }}
-              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="showPending" className="text-sm font-medium text-slate-700 whitespace-nowrap">
-              Pending Approval
-            </label>
-          </div>
-        </div>
-      </div>
+      </header>
 
-      {loading ? (
-        <Loader label="Loading users..." />
-      ) : users.length ? (
-        <>
-          <UserTable 
-            users={users} 
-            onDelete={setDeleteUser} 
-            onRestore={onRestoreUser} 
-            onApprove={onApproveUser}
-          />
-          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
-        </>
-      ) : (
-        <EmptyState
-          title="No users found"
-          description="Try changing search terms or role filter, or create a new user."
-          action={
-            <Link
-              to="/users/create"
-              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+      <div className="card-premium overflow-hidden">
+        <div className="grid gap-4 p-6 sm:grid-cols-4 lg:grid-cols-5 border-b border-slate-100 bg-slate-50/30">
+          <div className="sm:col-span-2">
+            <SearchBar value={search} onChange={setSearch} placeholder="Search by name or email..." />
+          </div>
+          <select
+            value={roleFilter}
+            onChange={(event) => {
+              setRoleFilter(event.target.value)
+              setPage(1)
+            }}
+            className="input-premium py-2 cursor-pointer"
+          >
+            <option value="all">Global Search</option>
+            <option value="admin">Administrators</option>
+            <option value="manager">Managers</option>
+            <option value="user">Standard Users</option>
+          </select>
+          <div className="flex items-center gap-4 px-2 sm:col-span-2 lg:col-span-2">
+            <button
+              onClick={() => setShowDeleted(!showDeleted)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${showDeleted ? 'bg-rose-50 text-rose-600 ring-1 ring-rose-200' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}`}
             >
-              <Plus className="h-4 w-4" />
-              Add User
-            </Link>
-          }
-        />
-      )}
+              <Filter size={14} />
+              {showDeleted ? 'Showing Deleted' : 'Active Only'}
+            </button>
+            <button
+              onClick={() => setShowPending(!showPending)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all ${showPending ? 'bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+            >
+              <Filter size={14} />
+              {showPending ? 'Pending Approval' : 'All Requests'}
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-100 border-t-primary-600" />
+            <p className="mt-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Synchronizing directory...</p>
+          </div>
+        ) : users.length ? (
+          <div className="animate-in fade-in duration-500">
+            <UserTable
+              users={users}
+              onDelete={setDeleteUser}
+              onRestore={onRestoreUser}
+              onApprove={onApproveUser}
+            />
+            <div className="p-6 border-t border-slate-100 bg-slate-50/10">
+              <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+            </div>
+          </div>
+        ) : (
+          <div className="py-20">
+            <EmptyState
+              title="No identities found"
+              description="Refine your search parameters or check the filters to find what you're looking for."
+              action={
+                <Link to="/users/create" className="btn-primary">
+                  <Plus size={18} />
+                  Add New User
+                </Link>
+              }
+            />
+          </div>
+        )}
+      </div>
 
       <ConfirmDeleteModal
         open={Boolean(deleteUser)}
-        title="Delete user?"
-        description={`This action will permanently remove ${deleteUser?.name || 'this user'}.`}
+        title="Archive User Identity?"
+        description={`Are you sure you want to deauthorize and archive ${deleteUser?.name || 'this user'}? This action can be reversed by an admin.`}
         loading={deleteLoading}
         onCancel={() => setDeleteUser(null)}
         onConfirm={onConfirmDelete}
       />
-    </section>
+    </div>
   )
 }
 

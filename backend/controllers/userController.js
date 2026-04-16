@@ -163,7 +163,7 @@ exports.getUser = async (req, res, next) => {
 // @access  Private
 exports.updateUser = async (req, res, next) => {
   try {
-    const { name, email, role, isActive } = req.body;
+    const { name, email, role, isActive, password } = req.body;
     const user = await User.findOne({ _id: req.params.id, isDeleted: false });
 
     if (!user) {
@@ -177,12 +177,18 @@ exports.updateUser = async (req, res, next) => {
       }
     }
 
+    // Security Check: Standard users can only update themselves
+    if (req.user.role === 'user' && req.user.id !== req.params.id) {
+      return res.status(403).json({ success: false, message: 'Access denied. You can only update your own profile.' });
+    }
+
     const oldData = { name: user.name, email: user.email, role: user.role, isActive: user.isActive };
 
     if (name) user.name = name;
     if (email) user.email = email;
     if (role) user.role = role;
     if (isActive !== undefined) user.isActive = isActive;
+    if (password) user.password = password;
     user.updatedBy = req.user.id;
 
     await user.save();
