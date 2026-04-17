@@ -93,10 +93,6 @@ const Dashboard = () => {
               )
             })}
           </div>
-          <button className="mt-8 w-full flex items-center justify-center gap-2 text-sm font-bold text-slate-500 hover:text-primary-600 transition-colors py-2 group">
-            View Audit Trails
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-          </button>
         </div>
       </div>
     </div>
