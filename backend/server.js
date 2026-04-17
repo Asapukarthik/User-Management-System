@@ -11,6 +11,7 @@ const rateLimit = require('express-rate-limit');
 connectDB();
 
 const app = express();
+app.set('trust proxy', 1); // Enable proxy trusting for accurate rate limiting
 
 // Security Middlewares
 app.use(helmet());
