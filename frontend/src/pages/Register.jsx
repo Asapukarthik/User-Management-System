@@ -8,9 +8,11 @@ const Register = () => {
     name: '',
     email: '',
     password: '',
+    passwordConfirm: '',
     role: 'user',
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
@@ -22,8 +24,13 @@ const Register = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault()
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim() || !formData.passwordConfirm.trim()) {
       setError('Please fill in all required fields.')
+      return
+    }
+
+    if (formData.password !== formData.passwordConfirm) {
+      setError('Passwords do not match.')
       return
     }
 
@@ -101,7 +108,7 @@ const Register = () => {
               <label htmlFor="password" className="text-sm font-semibold text-slate-700">Password</label>
               <div className="relative group">
                 <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-500" />
-                <input id="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} className="input-premium pl-11 pr-11" placeholder="••••••••" required />
+                <input id="password" type={showPassword ? 'text' : 'password'} value={formData.password} onChange={handleChange} className="input-premium pl-11 pr-11" placeholder="••••••••" required minLength="6" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 transition-colors">
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -109,16 +116,17 @@ const Register = () => {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="role" className="text-sm font-semibold text-slate-700">Account Type</label>
+              <label htmlFor="passwordConfirm" className="text-sm font-semibold text-slate-700">Confirm Password</label>
               <div className="relative group">
-                <Briefcase size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-500" />
-                <select id="role" value={formData.role} onChange={handleChange} className="input-premium pl-11 appearance-none">
-                  <option value="user">Standard User</option>
-                  <option value="manager">Team Manager</option>
-                  <option value="admin">System Administrator</option>
-                </select>
+                <Lock size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-primary-500" />
+                <input id="passwordConfirm" type={showPasswordConfirm ? 'text' : 'password'} value={formData.passwordConfirm} onChange={handleChange} className="input-premium pl-11 pr-11" placeholder="••••••••" required />
+                <button type="button" onClick={() => setShowPasswordConfirm(!showPasswordConfirm)} className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 transition-colors">
+                  {showPasswordConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
             </div>
+
+
 
             {error && (
               <div className="flex items-center gap-2 rounded-xl bg-rose-50 p-4 text-xs font-bold text-rose-600 border border-rose-100">
